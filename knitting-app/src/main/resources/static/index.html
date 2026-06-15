@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YarnYard</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧶</text></svg>">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/markdown-it@14.1.0/dist/markdown-it.min.js"></script><script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+    </script>
+    <script src="script.js" defer></script>
+</head>
+<body>
+<div class="app">
+    <div class="header">
+        <h1>🧶 YarnYard</h1>
+        <p>Схемы вязания на любой вкус</p>
+        <div class="user-area">
+            <div id="userBlockLoggedOut" style="display: flex; gap: 8px;">
+                <button id="loginBtn" class="user-btn">🔑 Войти</button>
+                <button id="registerBtn" class="user-btn">✨ Регистрация</button>
+            </div>
+            <div id="userBlockLoggedIn" style="display: none; align-items: center; gap: 16px;">
+                <span id="usernameDisplay" style="font-weight: 600; cursor: pointer;"></span>
+                <button id="adminPanelBtn" class="user-btn" style="display: none;">🛠️ Админ</button>
+                <button id="logoutBtn" class="user-btn"> Выйти</button>
+            </div>
+        </div>
+        <div class="global-search">
+            <div class="search-wrapper">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" id="globalSearchInput" placeholder="Поиск схем и пряжи..." autocomplete="off">
+                <button id="clearSearchBtn" class="clear-search-btn" style="display: none;">&times;</button>
+            </div>
+            <div id="searchDropdown" class="search-dropdown" style="display: none;">
+                <div class="search-dropdown-header">
+                    <div class="search-tabs">
+                        <button class="search-tab-btn active" data-search-type="patterns">📄 Схемы</button>
+                        <button class="search-tab-btn" data-search-type="yarns">🧶 Пряжа</button>
+                    </div>
+                    <div class="search-filters-mini" id="patternsFiltersMini">
+                        <select id="searchCategoryMini">
+                            <option value="">Все категории</option>
+                            <option value="Игрушки">Игрушки</option>
+                            <option value="Одежда">Одежда</option>
+                            <option value="Аксессуары">Аксессуары</option>
+                        </select>
+                        <select id="searchDifficultyMini">
+                            <option value="">Любая сложность</option>
+                            <option value="Начинающий">Начинающий</option>
+                            <option value="Средний">Средний</option>
+                            <option value="Сложный">Сложный</option>
+                        </select>
+                        <select id="searchMaterialsMini">
+                            <option value="">Инструмент</option>
+                            <option value="Крючок">Крючок</option>
+                            <option value="Спицы">Спицы</option>
+                        </select>
+                    </div>
+                    <div id="yarnsFiltersMini" class="search-filters-mini" style="display: none;">
+                        <select id="searchBrandMini">
+                            <option value="">Бренд</option>
+                            <option value="Alize">Alize</option>
+                            <option value="YarnArt">YarnArt</option>
+                            <option value="Pekhorka">Pekhorka</option>
+                            <option value="Другой">Lana Gatto</option>
+                            <option value="Другой">Knitty</option>
+                        </select>
+                        <select id="searchCompositionMini">
+                            <option value="">Состав</option>
+                            <option value="шерсть">шерсть</option>
+                            <option value="акрил">акрил</option>
+                            <option value="хлопок">хлопок</option>
+                            <option value="альпака">альпака</option>
+                            <option value="мохер">мохер</option>
+                            <option value="кашемир">кашемир</option>
+                            <option value="вискоза">вискоза</option>
+                        </select>
+                        <select id="searchCountryMini">
+                            <option value="">Страна</option>
+                            <option value="Россия">Россия</option>
+                            <option value="Турция">Турция</option>
+                            <option value="Италия">Италия</option>
+                            <option value="США">США</option>
+                            <option value="Китай">Китай</option>
+                            <option value="Германия">Германия</option>
+                        </select>
+                        <select id="searchHookSizeMini">
+                            <option value="">Крючок (мм)</option>
+                            <option value="1">1</option>
+                            <option value="1.5">1.5</option>
+                            <option value="2">2</option>
+                            <option value="2.5">2.5</option>
+                            <option value="3">3</option>
+                            <option value="3.5">3.5</option>
+                            <option value="4">4</option>
+                            <option value="4.5">4.5</option>
+                            <option value="5">5</option>
+                            <option value="5.5">5.5</option>
+                            <option value="6">6</option>
+                            <option value="6.5">6.5</option>
+                        </select>
+                        <select id="searchNeedleSizeMini">
+                            <option value="">Спицы (мм)</option>
+                            <option value="1">1</option>
+                            <option value="1.5">1.5</option>
+                            <option value="2">2</option>
+                            <option value="2.5">2.5</option>
+                            <option value="3">3</option>
+                            <option value="3.5">3.5</option>
+                            <option value="4">4</option>
+                            <option value="4.5">4.5</option>
+                            <option value="5">5</option>
+                            <option value="5.5">5.5</option>
+                            <option value="6">6</option>
+                            <option value="6.5">6.5</option>
+                        </select>
+                        <div class="range-filter">
+                            <input type="number" id="searchWeightFromMini" placeholder="Вес от (г)" step="5" class="mini-filter-input">
+                            <span>-</span>
+                            <input type="number" id="searchWeightToMini" placeholder="Вес до (г)" step="5" class="mini-filter-input">
+                        </div>
+                        <div class="range-filter">
+                            <input type="number" id="searchLengthFromMini" placeholder="Метраж от (м)" step="10" class="mini-filter-input">
+                            <span>-</span>
+                            <input type="number" id="searchLengthToMini" placeholder="Метраж до (м)" step="10" class="mini-filter-input">
+                        </div>
+                    </div>
+                    <div><button id="resetSearchFiltersBtn" class="reset-filters-btn">Сбросить</button></div>
+                </div>
+                <div id="searchDropdownResults" class="search-dropdown-results">
+                    <div class="empty">Начните вводить текст для поиска</div>
+                </div>
+                <div class="search-dropdown-footer">
+                    <button id="closeSearchDropdown" class="close-dropdown-btn">Закрыть</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="tabs">
+        <button class="tab-btn active" data-tab="catalog">📖 Каталог</button>
+        <button class="tab-btn" data-tab="library">📚 Библиотека</button>
+        <button class="tab-btn" data-tab="calculator">🧮 Калькулятор</button>
+    </div>
+
+    <div id="catalog-tab" class="tab-content active">
+        <div class="sub-tabs catalog-subtabs">
+            <button class="sub-tab-btn active" data-subtab="schemes">📄 Схемы</button>
+            <button class="sub-tab-btn" data-subtab="yarns">🧶 Пряжа</button>
+        </div>
+
+        <div id="schemesView" class="schemes-view">
+            <div class="catalog-layout">
+                <aside class="filters-sidebar">
+                    <div class="filter-group">
+                        <h4>📂 Категория</h4>
+                        <label><input type="checkbox" value="Игрушки"> Игрушки</label>
+                        <label><input type="checkbox" value="Одежда"> Одежда</label>
+                        <label><input type="checkbox" value="Аксессуары"> Аксессуары</label>
+                    </div>
+                    <div class="filter-group">
+                        <h4>⭐ Сложность</h4>
+                        <label><input type="checkbox" value="Начинающий"> Начинающий</label>
+                        <label><input type="checkbox" value="Средний"> Средний</label>
+                        <label><input type="checkbox" value="Сложный"> Сложный</label>
+                    </div>
+                    <div class="filter-group">
+                        <h4>🧷 Материалы</h4>
+                        <label><input type="checkbox" value="Спицы"> Спицы</label>
+                        <label><input type="checkbox" value="Крючок"> Крючок</label>
+                    </div>
+                    <div class="filter-group">
+                        <h4>💰 Цена</h4>
+                        <label><input type="checkbox" value="free" class="price-filter"> Бесплатные</label>
+                        <label><input type="checkbox" value="paid" class="price-filter"> Платные</label>
+                    </div>
+                    <button id="resetFiltersBtn" class="filter-reset-btn">🗑️ Сбросить фильтры</button>
+                </aside>
+
+                <div class="catalog-main">
+                    <div id="catalogList" class="pattern-grid">
+                        <div class="empty">Загрузка...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="yarnsView" class="yarns-view" style="display: none;">
+            <div class="catalog-layout">
+                <aside class="filters-sidebar">
+                    <div class="filter-group">
+                        <h4>🏷️ Бренд</h4>
+                        <label><input type="checkbox" value="Alize"> Alize</label>
+                        <label><input type="checkbox" value="YarnArt"> YarnArt</label>
+                        <label><input type="checkbox" value="Pekhorka"> Pekhorka</label>
+                    </div>
+                    <div class="filter-group">
+                        <h4>🧶 Состав</h4>
+                        <label><input type="checkbox" value="шерсть"> шерсть</label>
+                        <label><input type="checkbox" value="акрил"> акрил</label>
+                        <label><input type="checkbox" value="хлопок"> хлопок</label>
+                    </div>
+                    <div class="filter-group">
+                        <h4>🌍 Страна</h4>
+                        <label><input type="checkbox" value="Россия"> Россия</label>
+                        <label><input type="checkbox" value="Турция"> Турция</label>
+                        <label><input type="checkbox" value="Италия"> Италия</label>
+                    </div>
+                    <button id="resetYarnFiltersBtn" class="filter-reset-btn">🗑️ Сбросить фильтры</button>
+                </aside>
+                <div class="catalog-main">
+                    <div id="catalogYarnsList" class="pattern-grid">Загрузка...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="library-tab" class="tab-content">
+        <div id="libraryGuestMessage" class="empty" style="display: none;">
+            <p>🔒 Для доступа к библиотеке необходимо войти в аккаунт.</p>
+            <button id="loginFromLibraryBtn" class="primary-btn" style="margin-top: 16px;">🔑 Войти</button>
+        </div>
+
+        <div id="libraryAuthContent">
+            <div class="sub-tabs">
+                <button class="sub-tab-btn active" data-subtab="my-uploads">📁 Мои загруженные</button>
+                <button class="sub-tab-btn" data-subtab="saved-catalog">📥 Сохранённые из каталога</button>
+                <button class="sub-tab-btn" data-subtab="saved-yarns">🧶 Сохранённая пряжа</button>
+                <button class="upload-btn" id="uploadBtn">➕ Загрузить PDF</button>
+            </div>
+            <div id="my-uploads" class="subtab-content active">
+                <div id="myUploadsList" class="pattern-grid"></div>
+            </div>
+            <div id="saved-catalog" class="subtab-content">
+                <div id="savedCatalogList" class="pattern-grid"></div>
+            </div>
+            <div id="saved-yarns" class="subtab-content">
+                <div id="savedYarnsList" class="pattern-grid"></div>
+            </div>
+        <div class="viewer-section">
+            <div class="scale-control">
+                <span>🔍 Масштаб</span>
+                <button id="zoomOutBtn" class="zoom-btn">−</button>
+                <span id="scaleValue">100%</span>
+                <button id="zoomInBtn" class="zoom-btn">+</button>
+                <button id="showNotesBtn" class="notes-toggle-btn">📝 Заметки</button>
+            </div>
+            <div class="canvas-container">
+                <canvas id="patternCanvas" style="display: none;"></canvas>
+                <div id="noPatternMsg" class="empty">Выберите схему из библиотеки для просмотра</div>
+            </div>
+            <div id="notesPanel" class="notes-panel" style="display: none;">
+                <div class="notes-panel-header">
+                    <h3>📝 Мои заметки</h3>
+                    <button id="closeNotesPanelBtn" class="close-btn">&times;</button>
+                </div>
+                <div class="notes-panel-content">
+                    <textarea id="notesTextarea" rows="10" placeholder="Ваши заметки к схеме..."></textarea>
+                    <button id="saveNotesPanelBtn" class="primary-btn">💾 Сохранить</button>
+                    <div id="notesStatus" class="notes-status"></div>
+                </div>
+            </div>
+            <div id="pageControls" class="page-controls" style="display: none;">
+                <button id="prevPageBtn" class="page-nav-btn" disabled>◀ Предыдущая</button>
+                <span id="pageInfo">Страница <span id="currentPageNum">1</span> из <span id="totalPagesNum">?</span></span>
+                <button id="nextPageBtn" class="page-nav-btn" disabled>Следующая ▶</button>
+            </div>
+        </div>
+    </div>
+    </div>
+
+    <div id="calculator-tab" class="tab-content">
+        <div class="calc-card">
+            <div class="calc-yarn-selector">
+                <button type="button" id="selectYarnBtn" class="secondary-btn">🧶 Выбрать пряжу</button>
+                <div id="selectedYarnInfo" class="selected-yarn-info">Пряжа не выбрана</div>
+            </div>
+
+            <div class="calc-grid">
+                <div class="calc-item">
+                    <h3>📊 Плотность вязания</h3>
+                    <div class="input-row">
+                        <label>Петель на 10 см:</label>
+                        <input type="number" id="gaugeStitches10" step="0.1">
+                    </div>
+                    <div class="input-row">
+                        <label>Рядов на 10 см:</label>
+                        <input type="number" id="gaugeRows10" step="0.1">
+                    </div>
+                </div>
+
+                <div class="calc-item">
+                    <h3>📏 Размеры образца</h3>
+                    <div class="input-row">
+                        <label>Ширина (см):</label>
+                        <input type="number" id="sampleWidthCm" step="0.1">
+                    </div>
+                    <div class="input-row">
+                        <label>Высота (см):</label>
+                        <input type="number" id="sampleHeightCm" step="0.1">
+                    </div>
+                    <div class="input-row">
+                        <label>Длина нити (м):</label>
+                        <input type="number" id="sampleYarnLengthM" step="0.1">
+                    </div>
+                    <small>Распустите образец и измерьте длину получившейся нити</small>
+                </div>
+
+                <div class="calc-item">
+                    <h3>📐 Размеры изделия</h3>
+                    <div class="input-row">
+                        <label>Ширина (см):</label>
+                        <input type="number" id="itemWidthCm" step="0.1">
+                    </div>
+                    <div class="input-row">
+                        <label>Высота (см):</label>
+                        <input type="number" id="itemHeightCm" step="0.1">
+                    </div>
+                    <div class="input-row">
+                        <button type="button" id="calcStitchesRowsBtn" class="secondary-btn"> Вычислить петли и ряды</button>
+                    </div>
+                    <div class="input-row">
+                        <label>Петель в ширину:</label>
+                        <input type="number" id="itemStitchesW" step="1">
+                    </div>
+                    <div class="input-row">
+                        <label>Рядов в высоту:</label>
+                        <input type="number" id="itemRowsH" step="1">
+                    </div>
+
+                </div>
+
+                <div class="calc-item">
+                    <h3>🧶 Расход пряжи</h3>
+                    <div class="input-row">
+                        <label>Метраж на 100 г (м):</label>
+                        <input type="number" id="yarnMeterPer100g" step="10">
+                    </div>
+                    <div class="input-row">
+                        <button type="button" id="calcConsumptionBtn" class="secondary-btn"> Рассчитать расход</button>
+                    </div>
+                    <div class="input-row">
+                        <label>Необходимая длина:</label>
+                        <span id="requiredLengthM" class="result">--- м</span>
+                    </div>
+                    <div class="input-row">
+                        <label>Необходимый вес:</label>
+                        <span id="requiredWeightG" class="result">--- г</span>
+                    </div>
+                </div>
+            </div>
+            <div class="input-row">
+                <button type="button" id="resetCalculatorBtn" class="secondary-btn">🗑️ Сбросить значения</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="loginModal" class="modal">
+    <div class="modal-content">
+        <span class="close" data-modal="loginModal">&times;</span>
+        <h2>Вход</h2>
+        <form id="loginForm">
+            <div class="form-group">
+                <label>Имя пользователя</label>
+                <input type="text" id="loginUsername" required>
+            </div>
+            <div class="form-group">
+                <label>Пароль</label>
+                <input type="password" id="loginPassword" required>
+            </div>
+            <button type="submit" class="primary-btn">Войти</button>
+            <p class="switch-link">Нет аккаунта? <a id="switchToRegister">Зарегистрироваться</a></p>
+        </form>
+    </div>
+</div>
+
+<div id="registerModal" class="modal">
+    <div class="modal-content">
+        <span class="close" data-modal="registerModal">&times;</span>
+        <h2>Регистрация</h2>
+        <form id="registerForm">
+            <div class="form-group">
+                <label>Имя пользователя</label>
+                <input type="text" id="regUsername" required>
+            </div>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="regEmail" required>
+            </div>
+            <div class="form-group">
+                <label>Пароль (минимум 6 символов)</label>
+                <input type="password" id="regPassword" required minlength="6">
+            </div>
+            <button type="submit" class="primary-btn">Зарегистрироваться</button>
+            <p class="switch-link">Уже есть аккаунт? <a id="switchToLogin">Войти</a></p>
+        </form>
+    </div>
+</div>
+
+<div id="patternDetailModal" class="modal">
+    <div class="modal-content detail-modal-content">
+        <span class="close" data-modal="patternDetailModal">&times;</span>
+        <div id="patternDetailContent"></div>
+    </div>
+</div>
+    <div id="uploadModal" class="modal">
+        <div class="modal-content" style="max-width: 500px;">
+            <span class="close" data-modal="uploadModal">&times;</span>
+            <h2>➕ Добавить схему</h2>
+            <form id="uploadForm" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label>PDF-файл схемы *</label>
+                    <input type="file" id="uploadPdf" accept="application/pdf" required>
+                </div>
+                <div class="form-group">
+                    <label>Обложка (по желанию)</label>
+                    <input type="file" id="uploadCover" accept="image/*">
+                    <small>Если не загружена, будет создана из PDF</small>
+                </div>
+                <div class="form-group">
+                    <label>Название *</label>
+                    <input type="text" id="uploadName" placeholder="Название схемы" required>
+                </div>
+                <div class="form-group">
+                    <label>Автор</label>
+                    <input type="text" id="uploadAuthor" placeholder="Имя автора" readonly>
+                    <small>По умолчанию ваше имя пользователя</small>
+                </div>
+                <div class="form-group">
+                    <label>Категория *</label>
+                    <select id="uploadCategory" required>
+                        <option value="">---</option>
+                        <option value="Игрушки">Игрушки</option>
+                        <option value="Одежда">Одежда</option>
+                        <option value="Аксессуары">Аксессуары</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Сложность *</label>
+                    <select id="uploadDifficulty" required>
+                        <option value="">---</option>
+                        <option value="Начинающий">Начинающий</option>
+                        <option value="Средний">Средний</option>
+                        <option value="Сложный">Сложный</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Материалы *</label>
+                    <select id="uploadMaterials" required>
+                        <option value="">---</option>
+                        <option value="Крючок">Крючок</option>
+                        <option value="Спицы">Спицы</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Цена (₽)</label>
+                    <input type="number" id="uploadPrice" min="0" step="1" placeholder="Оставьте пустым – бесплатно">
+                </div>
+                <div class="form-group">
+                    <label>Краткое описание</label>
+                    <textarea id="uploadDescription" rows="3" placeholder="Опишите схему..."></textarea>
+                </div>
+                <button type="submit" class="primary-btn">Загрузить</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div id="editPatternModal" class="modal">
+    <div class="modal-content" style="max-width: 500px;">
+        <span class="close" data-modal="editPatternModal">&times;</span>
+        <h2>✏️ Редактировать схему</h2>
+        <form id="editPatternForm">
+            <input type="hidden" id="editPatternId">
+            <div class="form-group">
+                <label>Название</label>
+                <input type="text" id="editName" required>
+            </div>
+            <div class="form-group">
+                <label>Категория</label>
+                <select id="editCategory" >
+                    <option value="">---</option>
+                    <option value="Игрушки">Игрушки</option>
+                    <option value="Одежда">Одежда</option>
+                    <option value="Аксессуары">Аксессуары</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Сложность</label>
+                <select id="editDifficulty">
+                    <option value="">---</option>
+                    <option value="Начинающий">Начинающий</option>
+                    <option value="Средний">Средний</option>
+                    <option value="Сложный">Сложный</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Материалы</label>
+                <select id="editMaterials">
+                    <option value="">---</option>
+                    <option value="Крючок">Крючок</option>
+                    <option value="Спицы">Спицы</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Цена (₽)</label>
+                <input type="number" id="editPrice" min="0" step="1" placeholder="Оставьте пустым – бесплатно">
+            </div>
+            <div class="form-group">
+                <label>Краткое описание</label>
+                <textarea id="editDescription" rows="3"></textarea>
+            </div>
+            <div class="form-actions" style="display: flex; gap: 10px; margin-top: 20px;">
+                <button type="submit" class="primary-btn">Сохранить изменения</button>
+                <button type="button" id="cancelEditBtn" class="secondary-btn">Отмена</button>
+            </div>
+        </form>
+    </div>
+</div>
+<div id="yarnDetailModal" class="modal">
+    <div class="modal-content" style="max-width: 500px;">
+        <span class="close" data-modal="yarnDetailModal">&times;</span>
+        <div id="yarnDetailContent"></div>
+    </div>
+</div>
+<div id="selectYarnModal" class="modal">
+    <div class="modal-content" style="max-width: 700px;">
+        <span class="close" data-modal="selectYarnModal">&times;</span>
+        <h2>🧶 Выберите пряжу</h2>
+        <div id="yarnSelectorList" class="yarn-grid" style="max-height: 60vh; overflow-y: auto;">
+            <div class="empty">Загрузка...</div>
+        </div>
+    </div>
+</div>
+<div id="authorProfileModal" class="modal">
+    <div class="modal-content" style="max-width: 700px;">
+        <span class="close" data-modal="authorProfileModal">&times;</span>
+        <div id="authorProfileContent">
+            <h2 id="authorProfileName"></h2>
+            <div id="authorPatternsList" class="pattern-grid"></div>
+        </div>
+    </div>
+</div>
+<div id="aiAssistant" class="ai-assistant">
+    <div class="ai-button" id="aiToggleBtn">
+        <i class="fas fa-robot"></i>
+    </div>
+    <div class="ai-chat-window" id="aiChatWindow" style="display: none;">
+        <div class="ai-chat-header">
+            🧠 YarnYard помощник
+            <button id="aiCloseBtn">&times;</button>
+        </div>
+        <div class="ai-chat-messages" id="aiMessages">
+            <div class="ai-message bot">Привет! Спросите меня о вязании, а я с удовольствием Вам отвечу!</div>
+        </div>
+        <div class="ai-input-area">
+            <input type="text" id="aiInput" placeholder="Спросите о вязании..." />
+            <button id="aiSendBtn">➤</button>
+        </div>
+    </div>
+</div>
+<div id="profileModal" class="modal">
+    <div class="modal-content" style="max-width: 700px;">
+        <span class="close" data-modal="profileModal">&times;</span>
+        <h2>👤 Мой профиль</h2>
+        <div class="profile-tabs">
+            <button class="profile-tab-btn active" data-profile-tab="info">📋 Личные данные</button>
+            <button class="profile-tab-btn" data-profile-tab="purchases">🛒 История покупок</button>
+        </div>
+        <div id="profileInfoTab" class="profile-tab-content active">
+            <form id="profileForm">
+                <div class="form-group">
+                    <label>Имя пользователя</label>
+                    <input type="text" id="profileUsername" required>
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="profileEmail" required>
+                </div>
+                <div class="form-group">
+                    <label>Новый пароль</label>
+                    <input type="password" id="profilePassword" minlength="6">
+                </div>
+                <div class="form-group">
+                    <label>Подтверждение пароля</label>
+                    <input type="password" id="profilePasswordConfirm">
+                </div>
+                <button type="submit" class="primary-btn">Сохранить изменения</button>
+                <div id="profileMessage" class="message"></div>
+            </form>
+        </div>
+        <div id="profilePurchasesTab" class="profile-tab-content" style="display: none;">
+            <div id="purchasesList" class="purchases-list">
+                <div class="empty">Загрузка...</div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="adminModal" class="modal">
+    <div class="modal-content" style="max-width: 900px; width: 90%;">
+        <span class="close" data-modal="adminModal">&times;</span>
+        <h2>🛠️ Панель администратора</h2>
+        <div class="admin-tabs">
+            <button class="admin-tab-btn active" data-admin-tab="yarns">🧶 Пряжа</button>
+            <button class="admin-tab-btn" data-admin-tab="patterns">📄 Схемы</button>
+            <button class="admin-tab-btn" data-admin-tab="users">👥 Пользователи</button>
+            <button class="admin-tab-btn" data-admin-tab="categories">📂 Категории</button>
+            <button class="admin-tab-btn" data-admin-tab="stats">📊 Статистика</button>
+        </div>
+        <div id="adminYarnsTab" class="admin-tab-content active">
+            <h3>Управление пряжей</h3>
+            <button id="adminAddYarnBtn" class="primary-btn" style="margin-bottom: 15px;">➕ Добавить пряжу</button>
+            <div id="adminYarnsList" class="admin-table-container">Загрузка...</div>
+        </div>
+        <div id="adminPatternsTab" class="admin-tab-content">
+            <h3>Управление схемами</h3>
+            <div id="adminPatternsList" class="admin-table-container">Загрузка...</div>
+        </div>
+        <div id="adminUsersTab" class="admin-tab-content">
+            <h3>Управление пользователями</h3>
+            <div id="adminUsersList" class="admin-table-container">Загрузка...</div>
+        </div>
+        <div id="adminCategoriesTab" class="admin-tab-content">
+            <h3>Управление категориями</h3>
+            <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                <input type="text" id="newCategoryName" placeholder="Название категории">
+                <select id="newCategoryType" style="display: none;">
+                    <option value="PATTERN" selected></option>
+                </select>
+                <button id="adminAddCategoryBtn" class="primary-btn">➕ Добавить</button>
+            </div>
+            <div id="adminCategoriesList" class="admin-table-container">Загрузка...</div>
+        </div>
+        <div id="adminStatsTab" class="admin-tab-content">
+            <h3>Статистика</h3>
+            <div id="adminStatsContent" class="stats-container">Загрузка...</div>
+        </div>
+    </div>
+</div>
+
+<div id="adminYarnFormModal" class="modal">
+    <div class="modal-content" style="max-width: 800px; width: 90%; max-height: 85vh; display: flex; flex-direction: column;">
+        <span class="close" data-modal="adminYarnFormModal">&times;</span>
+        <h3 id="adminYarnFormTitle">Добавить пряжу</h3>
+        <div style="overflow-y: auto; padding-right: 8px;">
+            <form id="adminYarnForm">
+                <input type="hidden" id="adminYarnId">
+                <div class="form-two-columns">
+                    <div class="form-group">
+                        <label>Название *</label>
+                        <input type="text" id="adminYarnName" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Бренд</label>
+                        <input type="text" id="adminYarnBrand">
+                    </div>
+                    <div class="form-group">
+                        <label>Вес (г)</label>
+                        <input type="number" step="1" id="adminYarnWeight">
+                    </div>
+                    <div class="form-group">
+                        <label>Длина (м)</label>
+                        <input type="number" step="1" id="adminYarnLength">
+                    </div>
+                    <div class="form-group">
+                        <label>Состав</label>
+                        <input type="text" id="adminYarnComposition">
+                    </div>
+                    <div class="form-group">
+                        <label>Крючок (мм)</label>
+                        <input type="text" id="adminYarnHookSize">
+                    </div>
+                    <div class="form-group">
+                        <label>Спицы (мм)</label>
+                        <input type="text" id="adminYarnNeedleSize">
+                    </div>
+                    <div class="form-group">
+                        <label>Страна</label>
+                        <input type="text" id="adminYarnCountry">
+                    </div>
+                    <div class="form-group">
+                        <label>Петель на 10 см</label>
+                        <input type="number" id="adminYarnStitches">
+                    </div>
+                    <div class="form-group">
+                        <label>Рядов на 10 см</label>
+                        <input type="number" id="adminYarnRows">
+                    </div>
+                    <div class="form-group">
+                        <label>Изображение</label>
+                        <input type="file" id="adminYarnImage" accept="image/*">
+                        <div id="currentYarnImage" style="margin-top: 8px;"></div>
+                    </div>
+                </div>
+                <div class="form-actions" style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
+                    <button type="submit" class="primary-btn">Сохранить</button>
+                    <button type="button" id="cancelYarnFormBtn" class="secondary-btn">Отмена</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+</html>
